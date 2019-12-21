@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	csvFilename := flag.String("csv", "problems.csv", "A CSV file in the format of 'question,answer'")
+	csvFilename := flag.String("csv", "problems.csv", "A CSV file in the format of 'question,answer', answer has to be number or a single word")
 	timeLimit := flag.Int("limit", 30, "The time limit for the quiz in seconds")
 	flag.Parse()
 
@@ -36,7 +36,7 @@ problemLoop:
 		go func() {
 			var answer string
 			fmt.Scanf("%s\n", &answer)
-			answerCh <- answer
+			answerCh <- strings.ToLower(answer)
 		}()
 		select {
 		case <-timer.C:
@@ -57,7 +57,7 @@ func parseLines(lines [][]string) []problem {
 	for i, line := range lines {
 		ret[i] = problem{
 			q: line[0],
-			a: strings.TrimSpace(line[1]),
+			a: strings.TrimSpace(strings.ToLower(line[1])),
 		}
 	}
 	return ret
