@@ -14,6 +14,7 @@ func main() {
 	timeLimit := flag.Int("limit", 30, "The time limit for the quiz in seconds")
 	flag.Parse()
 
+	//Open and read the CSV file
 	file, err := os.Open(*csvFilename)
 	if err != nil {
 		exit(fmt.Sprintf("Failed to open the CSV file: %s\n", *csvFilename))
@@ -25,6 +26,7 @@ func main() {
 		exit("Failed to parse the provided CSV file.")
 	}
 
+	//Parse the lines of the files into a 'question,answer' format
 	problems := parseLines(lines)
 	timer := time.NewTimer(time.Duration(*timeLimit) * time.Second)
 	correct := 0
@@ -39,6 +41,7 @@ quizLoop:
 			answerCh <- strings.ToLower(answer)
 		}()
 		select {
+		// If the user runs out of time the game ends
 		case <-timer.C:
 			fmt.Println()
 			break quizLoop
@@ -56,6 +59,7 @@ func parseLines(lines [][]string) []problem {
 	ret := make([]problem, len(lines))
 	for i, line := range lines {
 		ret[i] = problem{
+			// q is the question, a is the answer
 			q: line[0],
 			a: strings.TrimSpace(strings.ToLower(line[1])),
 		}
